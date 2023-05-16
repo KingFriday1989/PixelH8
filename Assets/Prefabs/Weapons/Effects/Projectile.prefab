@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4756928411686313605
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4756928411686313607}
+  - component: {fileID: 4756928411686313606}
+  m_Layer: 7
+  m_Name: Projectile
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4756928411686313607
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4756928411686313605}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4756928411686313606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4756928411686313605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09c83daf7e3e1934099e8ce0f74a684d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smokePuffs:
+  - ID: Default
+    smokePuff: {fileID: 117709293547593383, guid: d8e0b5d1b85d4cc4da192871ac18d8a1,
+      type: 3}
+  impactList:
+  - ID: Default
+    impactSounds:
+    - {fileID: 8300000, guid: aa40488b01802254c9647aa8eef18fe8, type: 3}
+    - {fileID: 8300000, guid: 0a8a7b7c7ad8773478f9893aa72a98d0, type: 3}
+    - {fileID: 8300000, guid: 2f011dcb9b6b98a4dbf2113d5ed02ba2, type: 3}
+  specialParticleEffect: {fileID: 0}
+  bulletHole: {fileID: 397676056844028322, guid: 5afa5abe077042c4bb5f87a5fe1c83a2,
+    type: 3}
+  startPos: {x: 0, y: 0, z: 0}
+  lastPos: {x: 0, y: 0, z: 0}
+  hitPos: {x: 0, y: 0, z: 0}
+  gravityEffect: {x: 0, y: 0, z: 0}
+  gravityDelay: 20
+  maxDistance: 2000
+  distance: 0
+  originalVelocity: 0
+  bulletVelocity: 350
+  bulletVelocityFrame: 0
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 1049
+  canBounce: 1
+  bounced: 0
+  gravity: 0
