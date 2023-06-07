@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using PixelH8.Helpers;
+using PixelH8.Data;
 
 namespace PixelH8.Controllers.Weapons
 {
@@ -23,19 +25,18 @@ namespace PixelH8.Controllers.Weapons
 
         [SerializeField] public List<SmokePuffList> smokePuffs;
         public List<ImpactList> impactList;
-        public ParticleSystem specialParticleEffect;
+        public GameObject specialParticleEffect;
         public GameObject bulletHole;
 
         public Vector3 startPos;
         [SerializeField] private Vector3 lastPos;
-        [SerializeField] private Vector3 hitPos;
         [SerializeField] private Vector3 gravityEffect;
 
         public int gravityDelay = 20;
         public int maxDistance = 2000;
 
         public float distance;
-        public float originalVelocity;
+        public float originalVelocity = 250;
         public float bulletVelocity = 250;
         public int damageMin;
         public int damageMax;
@@ -49,14 +50,16 @@ namespace PixelH8.Controllers.Weapons
 
         //private bool inWater;
 
-        private void Start()
+        private void OnEnable()
         {
+            distance = 0;
             startPos = transform.position;
             lastPos = startPos;
-            originalVelocity = bulletVelocity;
+            bulletVelocity = originalVelocity;
+
         }
 
-        void Update()
+        void FixedUpdate()
         {
             //Check if gravity needs to be set
             if (!gravity && Vector3.Distance(startPos, transform.position) > gravityDelay)
@@ -73,9 +76,7 @@ namespace PixelH8.Controllers.Weapons
             if (hitInfo.collider != null)
             {
 
-                var newBulletHole = Instantiate(bulletHole);
-                var decalProjector = newBulletHole.GetComponentInChildren<DecalProjector>();
-                var bulletHoleManager = newBulletHole.GetComponent<BulletHole>();
+
                 var ID = hitInfo.collider.sharedMaterial == null ? "Default" :
                     hitInfo.collider.sharedMaterial.name.ToLower() == "dirt" ? "Dirt" :
                     hitInfo.collider.sharedMaterial.name.ToLower() == "field" ? "Dirt" ://Update with more effects
@@ -84,34 +85,34 @@ namespace PixelH8.Controllers.Weapons
                     hitInfo.collider.sharedMaterial.name.ToLower() == "wood planks" ? "Wood" :
                     hitInfo.collider.sharedMaterial.name.ToLower() == "metal grate" ? "Metal" :
                     "Default";
-                var newSmoke = Instantiate(smokePuffs.Find(x => x.ID == ID).smokePuff);
-                var newSpecialEffect = specialParticleEffect != null ? Instantiate(specialParticleEffect) : null;
-                var rb = hitInfo.rigidbody;
+                var newBulletHole = ObjectPoolManager.SpawnObject(bulletHole, hitInfo.point, Quaternion.Euler(Vector3.zero));
+                var bulletHoleManager = newBulletHole.GetComponent<BulletHole>();
 
                 bulletHoleManager.ID = ID;
                 newBulletHole.transform.up = hitInfo.normal;
-                decalProjector.transform.localRotation = Quaternion.Euler(new Vector3(90, 0, UnityEngine.Random.Range(-180, 180)));
-                newBulletHole.transform.position = hitInfo.point;
-                newBulletHole.transform.parent = hitInfo.collider.transform;
 
-                newSmoke.transform.parent = null;
-                newSmoke.transform.position = hitInfo.point;
+                var decalProjector = newBulletHole.GetComponentInChildren<DecalProjector>();
+                decalProjector.transform.localRotation = Quaternion.Euler(new Vector3(90, 0, UnityEngine.Random.Range(-180, 180)));
+
+
+
+                var newSmoke = ObjectPoolManager.SpawnObject(smokePuffs.Find(x => x.ID == ID).smokePuff, hitInfo.point, Quaternion.Euler(Vector3.zero));
                 newSmoke.transform.up = hitInfo.normal;
 
-                if(LayerMask.LayerToName(hitInfo.collider.gameObject.layer) == "Player" || LayerMask.LayerToName(hitInfo.collider.gameObject.layer) == "Enemy")
+                var newSpecialEffect = specialParticleEffect != null ? ObjectPoolManager.SpawnObject(specialParticleEffect, hitInfo.point, Quaternion.Euler(Vector3.zero)) : null;
+                var rb = hitInfo.rigidbody;
+
+                if (LayerMask.LayerToName(hitInfo.collider.gameObject.layer) == "Player" || LayerMask.LayerToName(hitInfo.collider.gameObject.layer) == "Enemy")
                 {
                     var playerHealth = hitInfo.collider.gameObject.GetComponent<Health>();
-                    playerHealth.Damage(UnityEngine.Random.Range(damageMin,damageMax +1));
-                }
-
-                if (newSpecialEffect != null)
-                {
-                    newSpecialEffect.transform.parent = null;
-                    newSpecialEffect.transform.position = hitInfo.point;
+                    playerHealth.Damage(UnityEngine.Random.Range(damageMin, damageMax + 1));
+                    canBounce = false;
                 }
 
                 var hitList = impactList.Find(x => x.ID == ID).impactSounds;
-                var hitsound = hitList[UnityEngine.Random.Range(0,hitList.Count)];
+                var hitsound = hitList[UnityEngine.Random.Range(0, hitList.Count)];
+
+                //adds velocity to an objects rigidboy
                 if (rb != null)
                 {
                     rb.velocity += transform.forward + -hitInfo.normal * (bulletVelocity / 4 * Time.deltaTime);
@@ -130,21 +131,23 @@ namespace PixelH8.Controllers.Weapons
                     if (hitInfoAngle < 160 && randChance)
                     {
                         var ricList = impactList.Find(x => x.ID == "Ricochet").impactSounds;
-                        var ricSnd = ricList[UnityEngine.Random.Range(0,ricList.Count)];
-                        bounced = true;
-                        AudioSource.PlayClipAtPoint(ricSnd, transform.position, 1); // Change these to a self destruct audio source that can adjust disance.
+                        if (ricList != null && ricList.Count > 0)
+                        {
+                            var ricSnd = ricList[UnityEngine.Random.Range(0, ricList.Count)];
+                            bounced = true;
+                            AudioTools.SpawnAudio(ObjectsAndData.Instance.AudioContainer.AudioObject, ricSnd, transform.position, 0.85f, 30, 0.8f,1.2f);
+                        }
                     }
                     else
                     {
-                        AudioSource.PlayClipAtPoint(hitsound, transform.position, 1);
-                        ObjectPoolManager.ReturnObjectToPool(gameObject);
-                        //Destroy(gameObject);
+                        AudioTools.SpawnAudio(ObjectsAndData.Instance.AudioContainer.AudioObject, hitsound, transform.position, 0.85f, 30, 0.8f,1.2f);
+                        RetrunToPool();
                     }
                 }
                 else
                 {
-                    AudioSource.PlayClipAtPoint(hitsound, transform.position, 1);
-                    ObjectPoolManager.ReturnObjectToPool(gameObject);
+                    AudioTools.SpawnAudio(ObjectsAndData.Instance.AudioContainer.AudioObject, hitsound, transform.position, 0.85f, 30, 0.8f,1.2f);
+                    RetrunToPool();
                     //Destroy(gameObject);
                 }
             }
@@ -180,14 +183,19 @@ namespace PixelH8.Controllers.Weapons
                     transform.position = transform.position + (transform.forward * bulletVelocityFrame);
             }
 
-            
+
             lastPos = transform.position;
             distance = Vector3.Distance(startPos, transform.position);
-            Debug.DrawLine(debugPos, lastPos,Color.green,5);
+            Debug.DrawLine(debugPos, lastPos, Color.green, 5);
 
             if (distance > maxDistance)
-                ObjectPoolManager.ReturnObjectToPool(gameObject);
-                //Destroy(gameObject);
+                RetrunToPool();
+            //Destroy(gameObject);
+        }
+
+        void RetrunToPool()
+        {
+            ObjectPoolManager.ReturnObjectToPool(gameObject);
         }
     }
 }

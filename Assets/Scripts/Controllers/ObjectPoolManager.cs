@@ -37,25 +37,14 @@ public class ObjectPoolManager : MonoBehaviour
             GameObject spawnableObj = pool.InactiveObjects.FirstOrDefault();
 
             if (spawnableObj == null)
-            {
-                // If there are no inactivate objects, create a new one
-                spawnableObj = Instantiate(objectToSpawn, spawnPosition, spawnRotation);
-                string goName = spawnableObj.name.Replace("(Clone)", string.Empty);
+        {
+            // If there are no inactivate objects, create a new one
+            spawnableObj = Instantiate(objectToSpawn, spawnPosition, spawnRotation);
+            string goName = spawnableObj.name.Replace("(Clone)", string.Empty);
 
-                // If no parent folder, create a new one with same name and object to spawn
-                if (_poolFolders.ContainsKey(goName))
-                {
-                    spawnableObj.transform.SetParent(_poolFolders[goName].transform);
-                }
-                else
-                {
-                    GameObject parentObject = new GameObject(goName);
-                    parentObject.transform.SetParent(_objectPoolEmptyHolder.transform);
-                    _poolFolders.Add(goName, parentObject);
-                    spawnableObj.transform.SetParent(_poolFolders[goName].transform);
-                }
-            }
-            else
+            PutObjectBackInPool(spawnableObj, goName);
+        }
+        else
             {
                 // If there is an inactive object, reactive it
                 spawnableObj.transform.position = spawnPosition;
@@ -67,11 +56,27 @@ public class ObjectPoolManager : MonoBehaviour
             return spawnableObj;
         }
 
-        /// <summary>
-        /// To spawn objects in the scene linked to a parent object
-        /// </summary>
-        /// <returns></returns>
-        public static GameObject SpawnObject(GameObject objectToSpawn, Transform parentTransform)
+    private static void PutObjectBackInPool(GameObject spawnableObj, string goName)
+    {
+        // If no parent folder, create a new one with same name and object to spawn
+        if (_poolFolders.ContainsKey(goName))
+        {
+            spawnableObj.transform.SetParent(_poolFolders[goName].transform);
+        }
+        else
+        {
+            GameObject parentObject = new GameObject(goName);
+            parentObject.transform.SetParent(_objectPoolEmptyHolder.transform);
+            _poolFolders.Add(goName, parentObject);
+            spawnableObj.transform.SetParent(_poolFolders[goName].transform);
+        }
+    }
+
+    /// <summary>
+    /// To spawn objects in the scene linked to a parent object
+    /// </summary>
+    /// <returns></returns>
+    public static GameObject SpawnObject(GameObject objectToSpawn, Transform parentTransform)
         {
             PooledObjectInfo pool = ObjectPools.Find(p => p.LoopupString == objectToSpawn.name);
 
@@ -94,6 +99,7 @@ public class ObjectPoolManager : MonoBehaviour
             else
             {
                 // If there is an inactive object, reactive it
+                spawnableObj.transform.SetParent(parentTransform);
                 pool.InactiveObjects.Remove(spawnableObj);
                 spawnableObj.SetActive(true);
             }
@@ -113,6 +119,7 @@ public class ObjectPoolManager : MonoBehaviour
             }
             else
             {
+                PutObjectBackInPool(obj,goName);
                 obj.SetActive(false);
                 pool.InactiveObjects.Add(obj);
             }

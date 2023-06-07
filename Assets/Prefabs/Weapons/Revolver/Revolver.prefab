@@ -1500,6 +1500,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f24ef4257d849554fb8ca97e040ab18a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponType: 0
+  weaponAttachments: 6
+  weaponModes: 1
   fireRPM: 300
   rps: Infinity
   lastShot: 0
@@ -1519,24 +1522,17 @@ MonoBehaviour:
   ShellEjectForce: 0
   EjectOnReload: 1
   HasCylender: 1
-  SingleShot: 1
+  fireReset: 0
+  burst: 0
+  BurstCount: 0
+  BurstCurrent: 0
   MagAmmo: 5
   MagMax: 5
   ReserveAmmo: 30
   ReserveMax: 30
   DamageMin: 60
   DamageMax: 80
-  AudioObject: {fileID: 94965764805619488, guid: 1aafed9abf7f90f42acb242c10a350f1,
-    type: 3}
   NonPrioritySources: []
-  Shoot: {fileID: 8300000, guid: c9378b33c1d72e44ea913743c59701f1, type: 3}
-  MagOut: {fileID: 8300000, guid: cfe86ab662ba5394090bb80e02248525, type: 3}
-  MagIn: {fileID: 8300000, guid: 6e3d75d62f951914fa330416b940917c, type: 3}
-  BoltBack: {fileID: 8300000, guid: 0d7f403fb74161e46a577e4609043035, type: 3}
-  BoltForward: {fileID: 8300000, guid: 318f1da7e31f7a346bdaeae20cd80801, type: 3}
-  currentCylRot: 0
-  desiredCylRot: 0
-  fireReset: 0
 --- !u!1 &7921860117515980681
 GameObject:
   m_ObjectHideFlags: 0

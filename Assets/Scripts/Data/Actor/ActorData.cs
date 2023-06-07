@@ -27,6 +27,7 @@ namespace PixelH8.Data.Actors
         public Vector3 move;
 
         public bool onGround;
+        public bool moving;
         public bool rotating;
         public bool forward;
         public bool backward;

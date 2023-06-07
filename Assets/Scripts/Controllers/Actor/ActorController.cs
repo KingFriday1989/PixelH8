@@ -4,6 +4,7 @@ using UnityEngine;
 using PixelH8.Data.Actors;
 using PixelH8.Controllers.Weapons;
 using PixelH8.Helpers;
+using PixelH8.Data;
 
 namespace PixelH8.Controllers.Actors
 {
@@ -13,6 +14,10 @@ namespace PixelH8.Controllers.Actors
     {
         public Actor actor;
         private ActorData data;
+        private float lastStep;
+        private float offsetX;
+        private float offsetY;
+        private float offsetZ;
 
         private void Start()
         {
@@ -25,6 +30,7 @@ namespace PixelH8.Controllers.Actors
             CheckMouse();
             MoveCamera();
             SetFirstPersonOffset();
+            SetCameraAnimator();
         }
         private void LateUpdate()
         {
@@ -52,6 +58,8 @@ namespace PixelH8.Controllers.Actors
         }
         void DoMove()
         {
+
+
             if (Grounded() && !data.isJumping)
             {
                 if (data.fall)
@@ -60,6 +68,7 @@ namespace PixelH8.Controllers.Actors
                     data.fall = false;
                     data.onGround = true;
                 }
+
 
                 if (data.jump && !data.isJumping && data.jumpTimer < Time.time)
                 {
@@ -81,6 +90,7 @@ namespace PixelH8.Controllers.Actors
                     );
                 }
 
+                data.moving = data.horizontalFloat > 0.125f || data.horizontalFloat < -0.125f || data.verticalFloat > 0.125f || data.verticalFloat < -0.125f;
                 data.move = transform.right * data.horizontalFloat + transform.forward * data.verticalFloat;
                 data.move = Vector3.ClampMagnitude(data.move, 1);
 
@@ -90,6 +100,7 @@ namespace PixelH8.Controllers.Actors
             else
             {
                 data.onGround = false;
+                data.moving = false;
 
                 if (!data.isJumping && Grounded(Mathf.Abs(data.velocity.y) * 0.125f) && !data.landDelay)
                     data.landDelay = true;
@@ -176,34 +187,48 @@ namespace PixelH8.Controllers.Actors
             {
                 if (!actor.actorData.Aim)
                 {
-                    //data.offsetTransform.localPosition = actor.actorInventory.items[currentSlot].positionOffset;
-                    if (Vector3.Distance(data.offsetTransform.localPosition, actor.actorInventory.items[currentSlot].positionOffset) > 0.001f)
+                    var currentItem = actor.actorInventory.items[currentSlot];
+                    var MX = UnityEngine.Input.GetAxis("Mouse X") * Time.deltaTime;
+                    var MY = UnityEngine.Input.GetAxis("Mouse Y") * Time.deltaTime;
+
+                    offsetX += -MX;
+                    offsetX = Mathf.Clamp(offsetX,-0.1f,0.1f);
+                    offsetY += -MY;
+                    offsetY = Mathf.Clamp(offsetY,-0.1f,0.1f);
+                    
+                    var offsetVector = new Vector3
+                        (
+                            offsetX + data.xRot * 0.0005f,
+                            offsetY + data.xRot * 0.0005f,
+                            -data.xRot * 0.0005f
+                        );
+
+                    if (Vector3.Distance(data.offsetTransform.localPosition, currentItem.positionOffset + offsetVector) > 0.001f)
                     {
-                        data.offsetTransform.localPosition = Vector3.Slerp(data.offsetTransform.localPosition, actor.actorInventory.items[currentSlot].positionOffset, Time.deltaTime * 8);
+                        data.offsetTransform.localPosition = Vector3.Slerp(data.offsetTransform.localPosition, currentItem.positionOffset + offsetVector, Time.deltaTime * 8);
                     }
                     else
-                        data.offsetTransform.localPosition = actor.actorInventory.items[currentSlot].positionOffset;
+                        data.offsetTransform.localPosition = currentItem.positionOffset + offsetVector;
 
-                    Physics.Raycast(actor.actorData.cameraTransform.position,
-                            actor.actorData.cameraTransform.forward,
-                            out RaycastHit hitInfo,
-                            2000f,
-                            actor.actorInventory.items[currentSlot].Projectile.GetComponent<WeaponProjectileRay>().layerMask);
-
+                    var hitInfo = actor.GetWeaponFirePoint(actor.actorData.cameraTransform.position, actor.actorData.cameraTransform.forward);
                     Vector3 AimPoint = Vector3.zero;
                     if (hitInfo.collider != false)
                         AimPoint = hitInfo.point;
                     else
                         AimPoint = actor.actorData.cameraTransform.position + actor.actorData.cameraTransform.forward * 2000;
 
-                    Vector3 lerpRot = Vector3.Slerp(data.offsetTransform.forward, AimPoint - data.offsetTransform.position, Time.deltaTime * 4);
+                    Vector3 lerpRot = Vector3.Slerp(data.offsetTransform.forward, AimPoint - data.offsetTransform.position, Time.deltaTime * 8);
 
                     data.offsetTransform.forward = lerpRot;
+
+                    offsetX = Mathf.Lerp(offsetX,0,Time.deltaTime * 16);
+                    offsetY = Mathf.Lerp(offsetY,0,Time.deltaTime * 16);
                 }
                 else
                 {
                     if (Vector3.Distance(data.offsetTransform.localPosition, new Vector3(0, 0, actor.actorInventory.items[currentSlot].positionOffset.z)) > 0.001f)
                     {
+                        
                         data.offsetTransform.localPosition = Vector3.Slerp(data.offsetTransform.localPosition, new Vector3(0, 0, actor.actorInventory.items[currentSlot].positionOffset.z), Time.deltaTime * 16);
                     }
                     else
@@ -211,13 +236,15 @@ namespace PixelH8.Controllers.Actors
 
                     if (Vector3.Distance(data.offsetTransform.localRotation.eulerAngles, Vector3.zero) > 0.01f)
                     {
-                        data.offsetTransform.localRotation = Quaternion.Euler(new Vector3(
-                            Mathf.LerpAngle(data.offsetTransform.localRotation.eulerAngles.x,0,Time.deltaTime * 8),
-                            Mathf.LerpAngle(data.offsetTransform.localRotation.eulerAngles.y,0,Time.deltaTime * 8),
-                            Mathf.LerpAngle(data.offsetTransform.localRotation.eulerAngles.z,0,Time.deltaTime * 8)
-                        ));
+                        data.offsetTransform.localRotation = Quaternion.Euler
+                        (new Vector3
+                            (
+                                Mathf.LerpAngle(data.offsetTransform.localRotation.eulerAngles.x, 0, Time.deltaTime * 8),
+                                Mathf.LerpAngle(data.offsetTransform.localRotation.eulerAngles.y, 0, Time.deltaTime * 8),
+                                Mathf.LerpAngle(data.offsetTransform.localRotation.eulerAngles.z, 0, Time.deltaTime * 8)
+                            )
+                        );
                     }
-                        //data.offsetTransform.localRotation = Quaternion.Euler(Vector3.Lerp(data.offsetTransform.localRotation.eulerAngles, Vector3.zero, Time.deltaTime * 4));
                     else
                         data.offsetTransform.localRotation = Quaternion.Euler(Vector3.zero);
 
@@ -229,9 +256,11 @@ namespace PixelH8.Controllers.Actors
                 data.offsetTransform.localRotation = Quaternion.Euler(Vector3.zero);
             }
         }
-        void SetFirstPersonAnimator()
+        void SetCameraAnimator()
         {
-            
+            actor.animator.SetFloat("Vert", data.Aim ? 0 : data.verticalFloat);
+            actor.animator.SetFloat("Hor", data.Aim ? 0 : data.horizontalFloat);
+            actor.animator.SetFloat("Speed", data.Aim ? 0 : data.speedModifier);
         }
 
         void FireWeapon()
@@ -240,7 +269,20 @@ namespace PixelH8.Controllers.Actors
             var weapon = actor.actorInventory.items[currentSlot];
             weapon.Fire();
         }
-        
+
+        public void PlayStep()
+        {
+            if (lastStep < Time.time)
+            {
+                lastStep = Time.time + 0.1f;
+                var audioClips = ObjectsAndData.Instance.AudioContainer.AudioLibrary.audioGroups.Find(x => x.ID == "Footsteps").audioLists.Find(x => x.ID == "Default").audioClips;
+                var clip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
+                var audPoint = AudioTools.SpawnAudio(ObjectsAndData.Instance.AudioContainer.AudioObject, clip, transform.position, 0.25f * data.speedModifier, 20, 0.9f, 1.1f);
+            }
+        }
+
+
+
         public bool Grounded(float distanceAdditive = 0)
         {
             var Pos1 = transform.position + new Vector3(0, actor.characterController.height / 2f, 0) + actor.characterController.center + Vector3.up * -actor.characterController.height * 0.5f;

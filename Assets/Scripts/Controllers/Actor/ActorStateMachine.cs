@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PixelH8.Controllers.Actors
 {
-    public class ActorStateMachine : StateMachineBase
+    public class ActorStateMachine : StateMachine
     {
         // Start is called before the first frame update
         void Start()

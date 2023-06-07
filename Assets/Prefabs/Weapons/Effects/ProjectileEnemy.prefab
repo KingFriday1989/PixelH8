@@ -54,18 +54,24 @@ MonoBehaviour:
     - {fileID: 8300000, guid: aa40488b01802254c9647aa8eef18fe8, type: 3}
     - {fileID: 8300000, guid: 0a8a7b7c7ad8773478f9893aa72a98d0, type: 3}
     - {fileID: 8300000, guid: 2f011dcb9b6b98a4dbf2113d5ed02ba2, type: 3}
+  - ID: Ricochet
+    impactSounds:
+    - {fileID: 8300000, guid: 153562997915e08479da5ee10b2a7890, type: 3}
+    - {fileID: 8300000, guid: 7647edc8c07123b46b74272e87821529, type: 3}
+    - {fileID: 8300000, guid: 6a2bd6863cba5f94b851e2da20e8b83e, type: 3}
   specialParticleEffect: {fileID: 0}
   bulletHole: {fileID: 397676056844028322, guid: 5afa5abe077042c4bb5f87a5fe1c83a2,
     type: 3}
   startPos: {x: 0, y: 0, z: 0}
   lastPos: {x: 0, y: 0, z: 0}
-  hitPos: {x: 0, y: 0, z: 0}
   gravityEffect: {x: 0, y: 0, z: 0}
   gravityDelay: 20
   maxDistance: 2000
   distance: 0
-  originalVelocity: 0
-  bulletVelocity: 350
+  originalVelocity: 50
+  bulletVelocity: 50
+  damageMin: 0
+  damageMax: 0
   bulletVelocityFrame: 0
   layerMask:
     serializedVersion: 2

@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0b40bf9528c9b47b914a7bbd58b207, type: 3}
+  m_Name: AudioContainer
+  m_EditorClassIdentifier: 
+  AudioObject: {fileID: 94965764805619488, guid: 1aafed9abf7f90f42acb242c10a350f1,
+    type: 3}
+  AudioLibrary:
+    audioGroups:
+    - ID: Footsteps
+      audioLists:
+      - ID: Default
+        audioClips:
+        - {fileID: 8300000, guid: 1e827fb1e0bd2194aa9fc775af35b5c3, type: 3}
+        - {fileID: 8300000, guid: 41e58e794137c584ca179bc0a6d133fc, type: 3}
+        - {fileID: 8300000, guid: 1bcd561f802759d469b23df3a8478a02, type: 3}
+        - {fileID: 8300000, guid: 8c4b64fa0afe9e742806b91461dd7195, type: 3}
+    - ID: Revolver
+      audioLists:
+      - ID: Fire
+        audioClips:
+        - {fileID: 8300000, guid: c9378b33c1d72e44ea913743c59701f1, type: 3}
+      - ID: MagOut
+        audioClips:
+        - {fileID: 8300000, guid: cfe86ab662ba5394090bb80e02248525, type: 3}
+      - ID: MagIn
+        audioClips:
+        - {fileID: 8300000, guid: 6e3d75d62f951914fa330416b940917c, type: 3}
+      - ID: BoltBack
+        audioClips:
+        - {fileID: 8300000, guid: 0d7f403fb74161e46a577e4609043035, type: 3}
+      - ID: BoltForward
+        audioClips:
+        - {fileID: 8300000, guid: 318f1da7e31f7a346bdaeae20cd80801, type: 3}
+    - ID: WeaponEffects
+      audioLists:
+      - ID: SmallShell
+        audioClips:
+        - {fileID: 8300000, guid: c054818d6b02e5c48aa64649f92afe73, type: 3}
+        - {fileID: 8300000, guid: 72a77fce3f2eb1946aa5ce35a42b26e7, type: 3}
+        - {fileID: 8300000, guid: 406467241a8a74148b44b522719457ea, type: 3}
+      - ID: 
+        audioClips: []
+      - ID: 
+        audioClips: []
+    - ID: Impacts
+      audioLists:
+      - ID: Default
+        audioClips:
+        - {fileID: 8300000, guid: 2f011dcb9b6b98a4dbf2113d5ed02ba2, type: 3}
+        - {fileID: 8300000, guid: aa40488b01802254c9647aa8eef18fe8, type: 3}
+        - {fileID: 8300000, guid: 0a8a7b7c7ad8773478f9893aa72a98d0, type: 3}
+      - ID: Ricochet
+        audioClips:
+        - {fileID: 8300000, guid: 153562997915e08479da5ee10b2a7890, type: 3}
+        - {fileID: 8300000, guid: 7647edc8c07123b46b74272e87821529, type: 3}
+        - {fileID: 8300000, guid: 6a2bd6863cba5f94b851e2da20e8b83e, type: 3}
+    - ID: 
+      audioLists: []
+    - ID: 
+      audioLists: []
+    - ID: 
+      audioLists: []
+    - ID: 
+      audioLists: []
+    - ID: 
+      audioLists: []

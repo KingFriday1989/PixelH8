@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PixelH8.Helpers;
+using PixelH8.Data;
 
 namespace PixelH8.Controllers.Weapons
 {
@@ -16,7 +18,7 @@ namespace PixelH8.Controllers.Weapons
         public Vector2 RandomRangeY = new Vector2(-10, 10);
         public Vector2 RandomRangeZ = new Vector2(0, 0);
 
-        private void Start()
+        private void OnEnable()
         {
             transform.localRotation =
             Quaternion.Euler(
@@ -28,13 +30,14 @@ namespace PixelH8.Controllers.Weapons
             var rb = GetComponent<Rigidbody>();
             if (rb != null)
             {
+                rb.isKinematic = false;
                 rb.velocity = rb.transform.right * Random.Range(velocity.x, velocity.y);
                 rb.angularVelocity = new Vector3(0, Random.Range(angularVelocity.x, angularVelocity.y), 0);
             }
             timer = Time.time + 10;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (timer < Time.time)
             {
@@ -43,7 +46,7 @@ namespace PixelH8.Controllers.Weapons
 
             var rb = GetComponent<Rigidbody>() != null ? GetComponent<Rigidbody>() : null;
             if (rb != null && Vector3.Distance(rb.velocity, Vector3.zero) < 0.01f)
-                Destroy(rb);
+                rb.isKinematic = true;
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -52,7 +55,7 @@ namespace PixelH8.Controllers.Weapons
             {
                 var audioclip = sounds[UnityEngine.Random.Range(0, sounds.Length)];
                 if (audioclip != null)
-                    AudioSource.PlayClipAtPoint(audioclip, transform.position, 0.5f);
+                    AudioTools.SpawnAudio(ObjectsAndData.Instance.AudioContainer.AudioObject, audioclip, transform.position, 0.4f, 10, 0.9f,1.1f);
 
                 if (bounce <= 4)
                     bounce++;

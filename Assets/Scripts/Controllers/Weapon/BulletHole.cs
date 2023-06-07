@@ -19,30 +19,40 @@ namespace PixelH8.Controllers.Weapons
         [HideInInspector] public string ID;
         private float timer;
 
-        private void Start()
+        private void OnEnable()
         {
             Material material = ReturnMaterial(ID);
             projector.material = material;
             timer = Time.time + decalTime;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (timer < Time.time)
             {
-                    Destroy(gameObject);
+                ObjectPoolManager.ReturnObjectToPool(gameObject);
             }
         }
 
-        private Material ReturnMaterial(string id) 
+        private Material ReturnMaterial(string id)
         {
-            if (ID != null)
+            if (ID != "")
             {
                 var matList = materials.Find(x => x.ID == ID).material;
-                var mat = matList[UnityEngine.Random.Range(0,matList.Count)];
-                return mat;
+                if (matList.Count > 0)
+                    return matList[UnityEngine.Random.Range(0, matList.Count)];
+                else
+                    return null;
             }
-            return materials.Find(x => x.ID == "Default").material[0];
+            else
+            {
+                Debug.Log("No Physics Material!");
+                var matList = materials.Find(x => x.ID == "Default").material;
+                if (matList.Count > 0)
+                    return matList[UnityEngine.Random.Range(0, matList.Count)];
+                else
+                    return null;
+            }
         }
     }
-} 
+}

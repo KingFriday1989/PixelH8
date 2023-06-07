@@ -66,30 +66,37 @@ namespace PixelH8.Controllers.Actors
                 if (actor.actorInventory.items[currentSlot])
                 {
                     var currentItem = actor.actorInventory.items[currentSlot];
-                    if (!currentItem.fireReset && !currentItem.wait && currentItem.lastShot < Time.time - currentItem.rps)
+                    if ((!currentItem.fireReset || currentItem.burst && currentItem.BurstCurrent < currentItem.BurstCount) && !currentItem.wait && currentItem.lastShot < Time.time - currentItem.rps)
                     {
-                        if(currentItem.SingleShot && !currentItem.fireReset)
+                        if(currentItem.GetWeaponMode() == Weapon.WeaponMode.Semi && !currentItem.fireReset)
                             currentItem.fireReset = true;
-                        if (currentItem.MagAmmo > 0)
+                        else if(currentItem.GetWeaponMode() == Weapon.WeaponMode.Burst)
                         {
-                            currentItem.MagAmmo--;
-                            Physics.Raycast(actor.actorData.cameraTransform.position,
-                            actor.actorData.cameraTransform.forward,
-                            out RaycastHit hitInfo,
-                            2000f,
-                            currentItem.Projectile.GetComponent<WeaponProjectileRay>().layerMask);
-
-                            Vector3 AimPoint = Vector3.zero;
-                            if (hitInfo.collider != false)
-                                AimPoint = hitInfo.point;
-                            else
-                                AimPoint = actor.actorData.cameraTransform.position + actor.actorData.cameraTransform.forward * 2000;
-
-                            //Debug.DrawLine(actor.actorData.cameraTransform.position,AimPoint,Color.red,10);
-                            currentItem.firePoint = AimPoint;
-                            currentItem.Fire();
+                            currentItem.burst = true;
+                            currentItem.BurstCurrent = 0;
                         }
 
+                        if (currentItem.MagAmmo > 0)
+                        {
+                            var hitInfo = actor.GetWeaponFirePoint(actor.actorData.cameraTransform.position,actor.actorData.cameraTransform.forward);
+                            Vector3 firePointNew = Vector3.zero;
+                            if (hitInfo.collider != false)
+                                firePointNew = hitInfo.point;
+                            else
+                                firePointNew = actor.actorData.cameraTransform.position + actor.actorData.cameraTransform.forward * 1000;
+                                
+                            currentItem.firePoint = firePointNew;
+                            currentItem.Fire();
+
+                            if(currentItem.burst)
+                                if(currentItem.BurstCurrent < currentItem.BurstCount)
+                                    currentItem.BurstCurrent++;
+                                else
+                                {
+                                    currentItem.burst = false;
+                                    currentItem.fireReset = false;
+                                }
+                        }
                     }
                 }
             }
@@ -101,6 +108,7 @@ namespace PixelH8.Controllers.Actors
                 {
                     if(currentItem.lastShot < Time.time - currentItem.rps)
                         currentItem.fireReset = false;
+                        currentItem.burst = false;
                 }
             }
 

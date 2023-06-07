@@ -6,17 +6,29 @@ namespace PixelH8.Helpers
 {
     public class AutoReturn : MonoBehaviour
     {
+        public bool Timed = false;
         public float returnDelay;
         private float startTime;
+        private bool returned;
 
-        void Start()
+        void OnEnable()
         {
             startTime = Time.time;
         }
-        void Update()
+        void OnDisable()
         {
-            if (startTime < Time.time - returnDelay * 4)
+            if(!returned)
                 ObjectPoolManager.ReturnObjectToPool(gameObject);
+        }
+        
+        void FixedUpdate()
+        {
+            if (Timed && Time.time >= startTime + returnDelay)
+            {
+                returned = true;
+                ObjectPoolManager.ReturnObjectToPool(gameObject);
+            }
+                
         }
     }
 }
