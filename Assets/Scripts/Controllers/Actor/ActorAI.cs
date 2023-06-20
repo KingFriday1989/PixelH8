@@ -12,8 +12,6 @@ namespace PixelH8.Controllers.Actors
         public StateMachine stateMachine;
         public Transform Target;
         public Weapon weapon;
-
-
         private float FireDelay;
         [HideInInspector] public Vector3 startPosition;
 

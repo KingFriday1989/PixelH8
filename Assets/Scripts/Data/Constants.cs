@@ -4,9 +4,11 @@ using UnityEngine;
 
 namespace PixelH8.Data
 {
-    public static class Constants
+    [CreateAssetMenu(fileName = "PixelH8/Data", menuName = "Data Sets/Constants")]
+    public class Constants : ScriptableObject
     {
-        public static LayerMask ShootableSurfaces;
+        [SerializeField] public LayerMask SolidObjects;
+        [SerializeField] public GameObject waypoint;
     }
 }
 

@@ -8,5 +8,9 @@ namespace PixelH8.Data
         public AudioContainer AudioContainer = AudioContainer.instance;
         [SerializeField]
         public WeaponContainer weaponContainer = WeaponContainer.instance;
+
+        public Constants constants;
+
+        public GameObject Waypoint;
     }
 }

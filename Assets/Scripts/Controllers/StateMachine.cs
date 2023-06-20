@@ -7,6 +7,7 @@ namespace PixelH8.Controllers
     public class StateMachine : MonoBehaviour
     {
         public Actors.ActorAI ActorAI;
+        public string _currentState;
         public StateBase CurrentState {get; private set;}
         public StateBase DefaultState {get; private set;}
         public StateBase Idle {get; private set;}
@@ -31,6 +32,7 @@ namespace PixelH8.Controllers
                 CurrentState.OnExitState(this);
 
             CurrentState = state;
+            _currentState = CurrentState.transform.name;
             CurrentState.OnEnterState(this);
         }
 

@@ -34,7 +34,6 @@ namespace PixelH8.Controllers.Actors
         }
         private void LateUpdate()
         {
-
         }
         private void FixedUpdate()
         {
@@ -192,16 +191,19 @@ namespace PixelH8.Controllers.Actors
                     var MY = UnityEngine.Input.GetAxis("Mouse Y") * Time.deltaTime;
 
                     offsetX += -MX;
-                    offsetX = Mathf.Clamp(offsetX,-0.1f,0.1f);
+                    offsetX = Mathf.Clamp(offsetX, -0.1f, 0.1f);
                     offsetY += -MY;
-                    offsetY = Mathf.Clamp(offsetY,-0.1f,0.1f);
-                    
+                    offsetY = Mathf.Clamp(offsetY, -0.1f, 0.1f);
+
                     var offsetVector = new Vector3
                         (
                             offsetX + data.xRot * 0.0005f,
                             offsetY + data.xRot * 0.0005f,
                             -data.xRot * 0.0005f
                         );
+
+                    offsetX = Mathf.Lerp(offsetX, 0, Time.deltaTime * 16);
+                    offsetY = Mathf.Lerp(offsetY, 0, Time.deltaTime * 16);
 
                     if (Vector3.Distance(data.offsetTransform.localPosition, currentItem.positionOffset + offsetVector) > 0.001f)
                     {
@@ -218,17 +220,18 @@ namespace PixelH8.Controllers.Actors
                         AimPoint = actor.actorData.cameraTransform.position + actor.actorData.cameraTransform.forward * 2000;
 
                     Vector3 lerpRot = Vector3.Slerp(data.offsetTransform.forward, AimPoint - data.offsetTransform.position, Time.deltaTime * 8);
-
                     data.offsetTransform.forward = lerpRot;
+                    data.offsetTransform.localEulerAngles = new Vector3(data.offsetTransform.localEulerAngles.x, data.offsetTransform.localEulerAngles.y, Mathf.Clamp(data.offsetTransform.localEulerAngles.z, -10, 10));
+                    //Vector3 clampedRot = new Vector3(data.offsetTransform.localRotation.x, data.offsetTransform.localRotation.y, data.offsetTransform.localRotation.z);
+                    //
+                    //data.offsetTransform.localEulerAngles = clampedRot;
 
-                    offsetX = Mathf.Lerp(offsetX,0,Time.deltaTime * 16);
-                    offsetY = Mathf.Lerp(offsetY,0,Time.deltaTime * 16);
                 }
                 else
                 {
                     if (Vector3.Distance(data.offsetTransform.localPosition, new Vector3(0, 0, actor.actorInventory.items[currentSlot].positionOffset.z)) > 0.001f)
                     {
-                        
+
                         data.offsetTransform.localPosition = Vector3.Slerp(data.offsetTransform.localPosition, new Vector3(0, 0, actor.actorInventory.items[currentSlot].positionOffset.z), Time.deltaTime * 16);
                     }
                     else
@@ -255,6 +258,10 @@ namespace PixelH8.Controllers.Actors
                 data.offsetTransform.localPosition = Vector3.zero;
                 data.offsetTransform.localRotation = Quaternion.Euler(Vector3.zero);
             }
+        }
+        void ClampFirstPersonWeapon()
+        {
+
         }
         void SetCameraAnimator()
         {
